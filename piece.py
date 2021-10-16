@@ -68,8 +68,10 @@ class Piece(object):
         """ 获取能移动的位置 """
         #TODO狮虎和老鼠类继承时将重写它
         self.target_area = []   #重置target_area
+        print("获取可移动位置时的poslist：\n",self.pos_list[self.team].values())
         def get(*pos:tuple):
             if pos not in RIVER and pos not in self.pos_list[self.team].values():   #避开河流和己方棋子
+                
                 self.target_area.append(pos)
 
         get(self._pos[0], self._pos[1]+1)
@@ -97,14 +99,12 @@ class Piece(object):
 
     def move(self,pos):
         """ 传入坐标后移动棋子，并完成吃子等相应判断 """
-        print("{}要往{}走了".format(self.name,pos))
         self.change_pos(pos)
 
         #获取敌人的队伍enemy_team，很别扭
         a=list(TEAM)
         a.remove(self.team)
         enemy_team = a[0]
-        print("enemy team is {}".format(enemy_team))
 
         if pos in tuple(self.pos_list[enemy_team].values()):    #判断：如果棋子与敌方的棋子相遇
             self.eat([k for k,v in self.pos_list[enemy_team].items() if v == pos].pop())    #通过值找到储存敌方棋子的对象的键
@@ -119,7 +119,7 @@ class Piece(object):
         """ 返回被选中的棋子对象 
             返回0时表示无选中棋子
             """
-        print(cls.piece_picked)
+
         return cls.piece_picked[0]
 
     @classmethod
@@ -132,24 +132,48 @@ class Piece(object):
         if cls.get_piece_picked() == 0:
             if pos in tuple(cls.pos_list[TEAM[cls.turn]].values()):             
                 [k for k,v in cls.pos_list[TEAM[cls.turn]].items() if v == pos].pop().picked_me()    #选中行动方的棋子
-
+                print("被选中的棋子是"+cls.get_piece_picked().name)
+                print("它可走的位置是",cls.get_piece_picked().target_area)
         else:
+            cls.get_piece_picked().get_target_area()
             if pos in cls.get_piece_picked().target_area: #点击坐标在传入棋子的可行动范围内，移动棋子，轮换执棋 
                 cls.get_piece_picked().move(pos)
-                print("我的坐标是",cls.get_piece_picked()._pos)
                 cls.get_piece_picked().not_picked()
                 cls.turn = not cls.turn
+                print("移动后刷新的位置为",cls.pos_list["black"].values())
+                print("="*10)
                 print("轮到",TEAM[cls.turn])
             elif pos == cls.get_piece_picked()._pos:  #点击正选中的棋子，取消选中
                 cls.get_piece_picked().not_picked()
             elif pos in tuple(cls.pos_list[TEAM[cls.turn]].values()):  #选中己方其他棋子，选中该棋子
                 cls.get_piece_picked().not_picked()
                 [k for k,v in cls.pos_list[TEAM[cls.turn]].items() if v == pos].pop().picked_me() 
+                print("被选中的棋子是"+cls.get_piece_picked().name)
+                print("它可走的位置是",cls.get_piece_picked().target_area)
+
             else:
                 cls.get_piece_picked().not_picked()   #其他情况，取消选中
 
             
+class Lion_tiger(Piece):
 
+    def __init__(self,name,team,*pos):
+        super(Lion_tiger,self).__init__(name,team,*pos)
+
+    def get_target_area(self):
+        """ 获取能移动的位置 """
+        self.target_area = []   #重置target_area
+        def get(*pos:tuple):
+            if pos not in self.pos_list[self.team].values():  #避开己方棋子
+                if pos in RIVER:
+                    self.target_area.append((self._pos[0]+(pos[0]-self._pos[0])*3 , self._pos[1]+(pos[1]-self._pos[1])*4))
+                else:
+                    self.target_area.append(pos)
+
+        get(self._pos[0], self._pos[1]+1)
+        get(self._pos[0], self._pos[1]-1)
+        get(self._pos[0]+1, self._pos[1])
+        get(self._pos[0]-1, self._pos[1])
 
 
 
@@ -157,18 +181,16 @@ class Piece(object):
 
 
 if __name__ == "__main__":
-    cat = Piece("猫",0,1,2)
-    print(cat.pos_list)
 
-    dog = Piece("狗",1,1,3)
+
+    dog = Lion_tiger("狗",1,0,3)
     print(dog.pos_list)
     dog.get_target_area()
     print(dog.target_area)
-    dog.move(1,2)
+    dog.move((1,2))
     print(dog._pos)
     print(dog.pos_list)
-    cat.picked_me()
-    print(Piece.piece_picked)
+
 
 
 

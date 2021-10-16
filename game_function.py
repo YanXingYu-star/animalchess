@@ -1,6 +1,7 @@
 import pygame
 import piece
 import sys
+import json
 
 pygame.init()
 screen = pygame.display.set_mode((50*7+200, 50*9))
@@ -14,10 +15,10 @@ def limit_frame():
     clock_time = clock.tick_busy_loop(60) 
 
 def create_piece():
-    """ 该函数中创建各个棋子的对象 """
-    cat = piece.Piece("猫",0,1,2)
-    print("cat\ncat\ncat")
-    dog = piece.Piece("狗",1,2,3)
+    with open("piece.json", "r",encoding="utf-8") as f:
+        data = json.load(f)    
+    for i in data['piece']:
+        piece.Piece(i["name"],i["team"],*eval(i["pos"]))
 
 def draw_river():
     for pos in piece.RIVER:
@@ -51,7 +52,6 @@ def draw_choice():
     """ 画选中棋子的金框 """
     if piece.Piece.get_piece_picked() != 0:
         pos = piece.Piece.get_piece_picked().get_real_pos()
-        print("is",pos)
         pygame.draw.rect(screen, (255,251,0), (pos[0], pos[1], 50, 50), 3) 
 
 
@@ -65,4 +65,4 @@ def blit_screen():
 
 if __name__ == '__main__':
     create_piece()
-    blit_screen()
+    print(piece.Piece.get_all_pieces())
