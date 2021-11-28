@@ -19,6 +19,10 @@ def create_piece():
         data = json.load(f)    
     for i in data['piece']:
         piece.Piece(i["name"],i["team"],*eval(i["pos"]))
+    for i in data['lion_tiger']:
+        piece.Lion_tiger(i["name"],i["team"],*eval(i["pos"]))
+    for i in data['mouse']:
+        piece.Mouse(i["name"],i["team"],*eval(i["pos"]))
 
 def draw_river():
     for pos in piece.RIVER:

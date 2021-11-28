@@ -12,8 +12,9 @@ font = pygame.font.Font('msyh.ttf', 30)
 animal = ["鼠","猫","狗","狼","豹","虎","狮","象"]
 
 RIVER:tuple = ((1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(4,3),(4,4),(4,5),(5,3),(5,4),(5,5)) #储存的代表河水的坐标
-
 TEAM = ("black","red")  
+TRAP = {TEAM[0]:((2,0),(4,0),(3,1)),TEAM[1]:((2,8),(4,8),(3,7))}
+HOME = {TEAM[0]:(3,0),TEAM[1]:(3,8)}
 
 
 class Piece(object):
@@ -33,6 +34,7 @@ class Piece(object):
         self._pos = pos #pos为行列数,左上角为0,0
 
         self.team = TEAM[team]  #team传入0或1
+        self.enemy_team = TEAM[not team]
 
         self.name = name
 
@@ -45,6 +47,7 @@ class Piece(object):
         self.target_area = []   #储存棋子能走的坐标的列表，用get_target_area方法初始化和更新
         self.get_target_area()  
     
+
     def get_pos(self):
         return self._pos
 
@@ -66,7 +69,6 @@ class Piece(object):
 
     def get_target_area(self):
         """ 获取能移动的位置 """
-        #TODO狮虎和老鼠类继承时将重写它
         self.target_area = []   #重置target_area
         print("获取可移动位置时的poslist：\n",self.pos_list[self.team].values())
         def get(*pos:tuple):
@@ -79,35 +81,36 @@ class Piece(object):
         get(self._pos[0]+1, self._pos[1])
         get(self._pos[0]-1, self._pos[1])
 
+            
+
 
     def del_me(self):
         """ 被吃时移除棋子的方法 """
         self.change_pos((-1,-1))
 
+    def eat_in_trap(self,other):
+        other.del_me()
 
     def eat(self,other):
         """ 两棋子相遇时执行吃子的判断 """
+        #value之差和7进行判断是为了让老鼠吃大象，感觉有点绕
 
-        if other.value > self.value:
-            print("我被吃了")
-            self.del_me()
-
-        elif other.value <= self.value:
+        if  other.value-self.value ==7 or other.value <= self.value and self.value-other.value != 7:
             print("{}队的{}被吃了".format(other.team,other.name))
             other.del_me() 
-
+        elif other.value > self.value or self.value-other.value ==7:
+            print("我被吃了")
+            self.del_me()
 
     def move(self,pos):
         """ 传入坐标后移动棋子，并完成吃子等相应判断 """
         self.change_pos(pos)
-
-        #获取敌人的队伍enemy_team，很别扭
-        a=list(TEAM)
-        a.remove(self.team)
-        enemy_team = a[0]
-
-        if pos in tuple(self.pos_list[enemy_team].values()):    #判断：如果棋子与敌方的棋子相遇
-            self.eat([k for k,v in self.pos_list[enemy_team].items() if v == pos].pop())    #通过值找到储存敌方棋子的对象的键
+        if pos in TRAP[self.enemy_team] and pos in tuple(self.pos_list[self.enemy_team].values()):
+            print("in trap")
+            self.eat_in_trap([k for k,v in self.pos_list[self.enemy_team].items() if v == pos].pop()) 
+        else:
+            if pos in tuple(self.pos_list[self.enemy_team].values()):    #判断：如果棋子与敌方的棋子相遇
+                self.eat([k for k,v in self.pos_list[self.enemy_team].items() if v == pos].pop())    #通过值找到储存敌方棋子的对象的键
 
     @classmethod
     def get_all_pieces(cls):
@@ -175,7 +178,26 @@ class Lion_tiger(Piece):
         get(self._pos[0]+1, self._pos[1])
         get(self._pos[0]-1, self._pos[1])
 
+class Mouse(Piece):
+    def __init__(self,name,team,*pos):
+        super(Mouse,self).__init__(name,team,*pos)
 
+    def get_target_area(self):
+        """ 获取能移动的位置 """
+        self.target_area = []   #重置target_area
+        print("获取可移动位置时的poslist：\n",self.pos_list[self.team].values())
+        def get(*pos:tuple):
+            if self._pos not in RIVER:
+                if pos not in self.pos_list[self.team].values():   #避开己方棋子
+                    self.target_area.append(pos)
+            else:
+                if pos not in self.pos_list[TEAM[0]].values() and pos not in self.pos_list[TEAM[1]].values(): 
+                    self.target_area.append(pos)  
+
+        get(self._pos[0], self._pos[1]+1)
+        get(self._pos[0], self._pos[1]-1)
+        get(self._pos[0]+1, self._pos[1])
+        get(self._pos[0]-1, self._pos[1])        
 
   
 
