@@ -1,12 +1,30 @@
-import game_function as gf
+import function_in_game as fun
+import screen_setting as sset
+import start_interface
+import piece
+
+fun.create_piece()
 
 
-gf.create_piece()
-print(1)
+def start_check_click(pos):
+        print(start_interface.start_button.check_click(pos))
+        print("open:{}".format(start_interface.start_button.open))
 
 
 while True:
-    gf.draw_checkerboard()
-    gf.event_check()
-    
-    gf.blit_screen()
+    """ 开始界面 """
+    sset.blit_start_screen()
+    sset.event_check(start_check_click)
+
+    while start_interface.game_start.take_effect:
+        """ 进入对局 """
+        if piece.Piece.game_over:
+            sset.blit_game_over()
+            start_interface.game_start.toggle_switch()
+            fun.create_piece()
+
+        fun.draw_checkerboard()
+        sset.event_check(fun.reponse_click)
+
+        sset.blit_game_screen()
+
