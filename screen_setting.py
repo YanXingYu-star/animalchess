@@ -1,10 +1,6 @@
-""" 该模块提供了与pygame进行交互的接口 """
+""" 该模块封装了pygame的几个函数 """
 import pygame
 import sys
-import piece
-import function_in_game as fun
-import start_interface
-from time import sleep
 from setting import *
 from typing import Tuple
 
@@ -16,8 +12,6 @@ clock = pygame.time.Clock()
 font = pygame.font.Font('msyh.ttf', 30)
 clock_time = clock.tick_busy_loop(60) 
 
-trap_text = font.render("陷", True, (0,0,255), (255,255,255))    #render(text, antialias, color, background=None)
-home_text = font.render("穴",True, (0,0,255), (255,255,255))
 
 """ 事件处理 """
 
@@ -28,9 +22,13 @@ def event_check(*fun_reponse_click):
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+                print('pos is')
+                print(event.pos)
                 for fun in fun_reponse_click:
                     fun(event.pos)
 
+def outter(func):
+    pass
 
 """ 图像显示 """
 
@@ -43,25 +41,19 @@ def blit_text(text:str,pos:tuple,color=BLACK,background=WHITE):
 def blit_rect(background_color,rect:Tuple[int,int,int,int],width):
     pygame.draw.rect(screen,background_color,rect,width)
 
-def blit_game_screen():
-    """ 绘制棋子 """
+def fill_background():
     screen.fill(WHITE) 
-    fun.draw_checkerboard()
-    for a_piece in piece.Piece.all_piece():    #依次绘制各棋子
-        blit_text(a_piece.name,a_piece.real_pos,TEAM[a_piece.team])
 
-    fun.draw_choice()
-    blit_text(*fun.turn())
+def update():
     pygame.display.update()
 
-def blit_start_screen():
-    screen.fill(WHITE) 
-    screen.blit(*start_interface.start_button.blit_parameter())  
-    pygame.display.update()
+def screen_update(func):
+    def inner():
+        screen.fill(WHITE)
+        func()
+        pygame.display.update()
+    return inner
 
 
-def blit_game_over():
-    screen.fill(WHITE)
-    blit_text("Game Over",(200,150))
-    pygame.display.update()
-    sleep(1)
+
+

@@ -19,7 +19,7 @@ class Piece(object):
         self._pos = pos  # pos为行列数,左上角为0,0
         self.team = team  # team传入0或1
         self.name = name
-        self.value = animal.index(self.name)  # 用ANIMAL列表中的顺序来代表棋子的价值，用来判断吃子       
+        self._value = animal.index(self.name)  # 用ANIMAL列表中的顺序来代表棋子的价值，用来判断吃子       
         self.board[self.team][self._pos] = self
         
     @property
@@ -38,6 +38,14 @@ class Piece(object):
     def real_pos(self):
         """ 获取棋子的实际坐标 """
         return (self.pos[0]*50, self.pos[1]*50)
+    
+    @property
+    def value(self):
+        if self.pos in TRAP[not self.team]: #敌方陷阱中的棋子价值为-1
+            return -1
+        else:
+            return self._value
+
 
     @property
     def passable_area(self):
@@ -78,37 +86,42 @@ class Piece(object):
         else:
             self.game_over.append(1)
 
-
-    def eat_in_trap(self, other):
-        other.del_me()
-
-    def eat(self, other):
-        """ 两棋子相遇时执行吃子的判断 """
-        # value之差和7进行判断是为了让老鼠吃大象，感觉有点绕
-
-        if other.value-self.value == 7 or other.value <= self.value and self.value-other.value != 7:
-            print("{}队的{}被吃了".format(other.team, other.name))
-            other.del_me()
-        elif other.value > self.value or self.value-other.value == 7:
-            print("我被吃了")
-            self.del_me()
-
+    def compare_value(self,target_piece):
+        """ 两棋子相遇时进行价值判断，返回较小的棋子 """
+        print(self.value)
+        print(target_piece.value)
+        #该方法默认self为主动的棋子
+        #吃掉陷阱中的棋子
+        if target_piece.value == -1:
+            print("is 1")
+            return target_piece
+        #老鼠吃大象
+        elif self.value == 0 and target_piece.value == 7:
+            print("is 2")
+            return target_piece
+        elif self.value == 7 and target_piece.value == 0:
+            print("is 3")
+            return self
+        #大吃小
+        elif self.value >= target_piece.value:
+            print("is 4")
+            return target_piece
+        elif self.value < target_piece.value:
+            print("is 5")
+            return self
 
     def move(self, pos):
         """ 传入坐标后移动棋子，并完成吃子等相应判断 """
         self.pos = pos
-        if pos in TRAP[self.team] and pos in tuple(self.board[not self.team].keys()):
-            print("in trap")
-            self.eat_in_trap(self.board[not self.team][pos])
-        else:
-            # 判断：如果棋子与敌方的棋子相遇
-            if pos in tuple(self.board[not self.team].keys()):
-                # 通过值找到储存敌方棋子的对象的键
-                self.eat(self.board[not self.team][pos])
-            print('is here')
-            if pos in (HOME[not self.team], 1):
-                self.game_over.append(1)
-                print("Game Over")
+
+        # 判断：如果棋子与敌方的棋子相遇
+        if pos in self.all_pos(not self.team):
+
+            self.compare_value(self.board[not self.team][pos]).del_me()
+        print('is here')
+        if pos in (HOME[not self.team], 1):
+            self.game_over.append(1)
+            print("Game Over")
 
     @classmethod
     def all_piece(cls,team='all'):
@@ -120,6 +133,7 @@ class Piece(object):
 
     @classmethod
     def all_pos(cls,team='all'):
+        """ 返回指定队伍棋子的坐标 """
         if team == 'all':
             return tuple(cls.board[0].keys())+tuple(cls.board[1].keys())
         else:
