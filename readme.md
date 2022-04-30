@@ -6,7 +6,7 @@
 
 仅完成了游戏的基本流程和一个简单的开始界面
 
-![Demo](\resource\Demo.gif)
+![Demo](.\resource\Demo.gif)
 
 
 
