@@ -1,7 +1,7 @@
 import function_in_game as fun
 import screen_setting as sset
 import start_menu
-import piece
+
 
 fun.create_piece()
 
@@ -18,7 +18,7 @@ while True:
 
     while start_menu.game_start.take_effect:
         """ 进入对局 """
-        if piece.Piece.game_over:
+        if fun.is_game_over():
             fun.blit_game_over()
             start_menu.game_start.toggle_switch()
             fun.create_piece()

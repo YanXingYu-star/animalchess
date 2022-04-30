@@ -16,3 +16,7 @@ GREEN = 0,255,0
 BLUE = 0,0,255
 BLACK = 0,0,0
 GOLD = 255,251,0
+
+""" window """
+DETA_X = 7 #为了棋子居于各自中间的偏差量
+DETA_Y = 5

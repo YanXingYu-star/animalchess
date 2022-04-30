@@ -38,6 +38,11 @@ class Piece(object):
     def real_pos(self):
         """ 获取棋子的实际坐标 """
         return (self.pos[0]*50, self.pos[1]*50)
+
+    @property
+    def blit_pos(self):
+        """ 获得棋子便宜后的实际坐标 """
+        return (self.pos[0]*50 + DETA_X, self.pos[1]*50 + DETA_Y)
     
     @property
     def value(self):
@@ -86,7 +91,7 @@ class Piece(object):
         else:
             self.game_over.append(1)
 
-    def compare_value(self,target_piece):
+    def compare_value(self,target_piece:'Piece'):
         """ 两棋子相遇时进行价值判断，返回较小的棋子 """
         print(self.value)
         print(target_piece.value)
@@ -124,7 +129,7 @@ class Piece(object):
             print("Game Over")
 
     @classmethod
-    def all_piece(cls,team='all'):
+    def all_piece(cls,team='all') -> List['Piece']:
         """ 返回包含所有棋子的元组 """
         if team == 'all':
             return tuple(cls.board[0].values())+tuple(cls.board[1].values())
@@ -140,42 +145,15 @@ class Piece(object):
             return tuple(cls.board[team].keys())
 
     @classmethod
-    def get_piece_picked(cls):
+    def piece_picked_1(cls):
+        pass
+
+    @classmethod
+    def get_piece_picked(cls) -> 'Piece': 
         """ 返回被选中的棋子对象 
             返回0时表示无选中棋子
             """
-
         return cls.piece_picked[0]
-
-    @classmethod
-    def reponse_click(cls, pos):
-        """ 响应鼠标在棋盘内的点击
-        pos : 行列数
-         """
-        print("点击位置为{}".format(pos))
-
-        if cls.get_piece_picked() == 0:
-            if pos in tuple(cls.board[cls.turn].keys()):
-                cls.board[cls.turn][pos].picked_me()
-                print("被选中的棋子是"+cls.get_piece_picked().name)
-                print("它可走的位置是", cls.get_piece_picked().passable_area)
-        else:
-
-            if pos in cls.get_piece_picked().passable_area:  # 点击坐标在传入棋子的可行动范围内，移动棋子，轮换执棋
-                cls.get_piece_picked().move(pos)
-                cls.get_piece_picked().not_picked()
-                cls.turn = not cls.turn
-
-            elif pos == cls.get_piece_picked()._pos:  # 点击正选中的棋子，取消选中
-                cls.get_piece_picked().not_picked()
-            # 选中己方其他棋子，选中该棋子
-            elif pos in tuple(cls.board[cls.turn].keys()):
-                cls.get_piece_picked().not_picked()
-                cls.board[cls.turn][pos].picked_me()
-
-
-            else:
-                cls.get_piece_picked().not_picked()  # 其他情况，取消选中
 
     @classmethod
     def reboot(cls):

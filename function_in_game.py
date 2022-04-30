@@ -6,6 +6,7 @@ import screen_setting as sset
 from setting import *
 from time import sleep
 
+""" 游戏初始化 """
 def create_piece():
     """ 重置棋盘，创建棋子对象 """
     Piece.reboot()
@@ -18,6 +19,8 @@ def create_piece():
     for i in data['mouse']:
         Mouse(i["name"],i["team"],*eval(i["pos"]))
 
+def is_game_over():
+    return Piece.game_over
 
 """ 图形绘制 """
 
@@ -28,11 +31,11 @@ def draw_river():
 def draw_trap(): 
     for t in TRAP:
         for pos in t:       
-            sset.blit_text("陷",(pos[0]*50, pos[1]*50),BLUE)
+            sset.blit_text("陷",(pos[0]*50+DETA_X, pos[1]*50+ DETA_Y),BLUE)
 
 def draw_home():
     for pos in HOME:
-        sset.blit_text("穴",(pos[0]*50, pos[1]*50),BLUE)
+        sset.blit_text("穴",(pos[0]*50+ DETA_X, pos[1]*50+ DETA_Y),BLUE)
 
 def draw_checkerboard():
     """ 绘制棋盘 """
@@ -51,7 +54,7 @@ def draw_choice():
 
 def turn():
     pos = (400,50)
-    if Piece.turn:
+    if actor_team:
         text = "轮到红方"
     else:
         text = "轮到黑方"
@@ -62,10 +65,9 @@ def blit_game_screen():
     """ 绘制棋子 """
     draw_checkerboard()
     for a_piece in piece.Piece.all_piece():    #依次绘制各棋子
-        sset.blit_text(a_piece.name,a_piece.real_pos,TEAM[a_piece.team])
+        sset.blit_text(a_piece.name,a_piece.blit_pos,TEAM[a_piece.team])
     draw_choice()
     sset.blit_text(*turn())
-
 
 def blit_game_over():
     sset.fill_background()
@@ -73,11 +75,37 @@ def blit_game_over():
     sset.update()
     sleep(1)
 
+
+
+""" 事件响应 """
+actor_team = 0
+
 def reponse_click(pos):
-    print(pos)
-    if pos[0] <= (50*7):
+
+        """ 响应鼠标在棋盘内的点击
+        pos : 行列数
+         """
+        global actor_team
         pos = Piece.convert_to_board(pos)
-        Piece.reponse_click(pos)
+        print("点击位置为{}".format(pos))
+        
 
+        if Piece.get_piece_picked() == 0:
 
+            if pos in Piece.all_pos(actor_team):
+                print(Piece.all_pos(actor_team))    
+                Piece.board[actor_team][pos].picked_me()
+                print("被选中的棋子是"+Piece.get_piece_picked().name)
+                print("它可走的位置是", Piece.get_piece_picked().passable_area)
+        else:
 
+            if pos in Piece.get_piece_picked().passable_area:  # 点击坐标在传入棋子的可行动范围内，移动棋子，轮换执棋
+                Piece.get_piece_picked().move(pos)
+                Piece.get_piece_picked().not_picked()
+                actor_team = not actor_team
+
+            elif pos == Piece.get_piece_picked()._pos:  # 点击正选中的棋子，取消选中
+                Piece.get_piece_picked().not_picked()
+            
+            elif pos in Piece.all_pos(actor_team):  # 选中己方其他棋子，选中该棋子
+                Piece.board[actor_team][pos].picked_me()
