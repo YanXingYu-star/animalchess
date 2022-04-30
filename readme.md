@@ -6,7 +6,7 @@
 
 仅完成了游戏的基本流程和一个简单的开始界面
 
-![Demo](https://github.com/1007951208/animals_chess/blob/6cbcdfc617a6e6de190860b7df0dfd0c33509d76/resource/Demo.gif)
+<img src="resource\Demo.gif"/>
 
 
 
