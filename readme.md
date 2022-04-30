@@ -6,9 +6,8 @@
 
 仅完成了游戏的基本流程和一个简单的开始界面
 
-![avatar](resource\Demo.gif)
 
-
+<img src="resource\Demo.gif"/>
 
 ### 框架
 
