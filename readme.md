@@ -6,6 +6,11 @@
 
 仅完成了游戏的基本流程和一个简单的开始界面
 
+<<<<<<< HEAD
+=======
+<img src="resource\Demo.gif"/>
+
+>>>>>>> 978d6358699d795fee60353fa46dd79e65270d3d
 
 <img src="resource\Demo.gif"/>
 
