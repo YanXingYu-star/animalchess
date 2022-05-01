@@ -1,7 +1,7 @@
 """ 该模块封装了pygame的几个函数 """
 import pygame
 from pygame import display,time,font,draw
-from pygame import event as pygame_event    #只是为了找到pygame内部moudle，不然运行前很多pygame类无法显示
+from pygame import event as pygame_event    #只是为了找到pygame内部moudle，不然运行前很多pygame类的实例无法显示其类型
 import sys
 from setting import *
 from typing import Tuple
