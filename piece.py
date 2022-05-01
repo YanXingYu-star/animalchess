@@ -8,7 +8,7 @@ class Piece(object):
         实例具有移动位置，判断吃子等方法.
         包含几个批量的控制棋子的类的方法，以及控制吃子的方法 """
     
-    board = [{},{}]
+    board:List[Dict[tuple,'Piece']] = [{},{}]
     turn = 0  # 两个队伍的轮换，0为黑队
     piece_picked = [0]  # 储存被选中的Piece对象
     game_over = [1]  
@@ -129,7 +129,7 @@ class Piece(object):
             print("Game Over")
 
     @classmethod
-    def all_piece(cls,team='all') -> List['Piece']:
+    def all_piece(cls,team:int='all') -> List['Piece']:
         """ 返回包含所有棋子的元组 """
         if team == 'all':
             return tuple(cls.board[0].values())+tuple(cls.board[1].values())
