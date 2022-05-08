@@ -35,6 +35,7 @@ class Button(object):
                 self.open_me()
             return self.pos_in_rect(click_pos)
 
+
     def check_click(self,pos):
 
             return self.is_click(pos)

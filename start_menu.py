@@ -7,5 +7,10 @@ start_button = Button((400,50,100,50),"开始游戏",game_start)
 def blit_start_screen():
     start_button.blit()
 
+@screen_setting.event_check1
+def start_check_click(pos):
+        print(start_button.check_click(pos))
+        print("open:{}".format(start_button.open))
+
 game_pause = Switch()
 pause_button = Button((400,150,100,50),"暂停游戏",game_pause)

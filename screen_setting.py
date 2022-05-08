@@ -29,8 +29,17 @@ def event_check(*fun_reponse_click):
                 for fun in fun_reponse_click:
                     fun(event.pos)
 
-def outter(func):
-    pass
+def event_check1(func):
+    def inner():
+        for event in pygame_event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    print('pos is')
+                    print(event.pos)
+                    func(event.pos)
+    return inner
 
 """ 图像显示 """
 

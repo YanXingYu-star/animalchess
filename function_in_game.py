@@ -1,10 +1,13 @@
 """ 对局进行中的函数 """
+
+from time import sleep
+import json
+
 import piece
 from piece import Piece,Lion_tiger,Mouse
-import json
 import screen_setting as sset
 from setting import *
-from time import sleep
+
 
 """ 游戏初始化 """
 def create_piece():
@@ -21,6 +24,7 @@ def create_piece():
 
 def is_game_over():
     return Piece.game_over
+
 
 """ 图形绘制 """
 
@@ -80,6 +84,7 @@ def blit_game_over():
 """ 事件响应 """
 actor_team = 0
 
+@sset.event_check1
 def reponse_click(pos):
 
         """ 响应鼠标在棋盘内的点击
