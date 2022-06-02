@@ -2,6 +2,7 @@ import function_in_game as fun
 import start_menu
 
 
+
 fun.create_piece()
 
 while True:
