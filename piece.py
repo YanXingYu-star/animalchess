@@ -10,7 +10,7 @@ class Piece(object):
     
     board:List[Dict[tuple,'Piece']] = [{},{}]
     turn = 0  # 两个队伍的轮换，0为黑队
-    piece_picked = [0]  # 储存被选中的Piece对象
+    piece_picked = 0  # 储存被选中的Piece对象
     game_over = [1]  
 
 
@@ -19,7 +19,7 @@ class Piece(object):
         self._pos = pos  # pos为行列数,左上角为0,0
         self.team = team  # team传入0或1
         self.name = name
-        self._value = animal.index(self.name)  # 用ANIMAL列表中的顺序来代表棋子的价值，用来判断吃子       
+        self._value = animal.index(self.name)+1 # 用ANIMAL列表中的顺序来代表棋子的价值，用来判断吃子       
         self.board[self.team][self._pos] = self
         
     @property
@@ -37,17 +37,17 @@ class Piece(object):
     @property
     def real_pos(self):
         """ 获取棋子的实际坐标 """
-        return (self.pos[0]*50, self.pos[1]*50)
+        return (self.pos[1]*50, self.pos[0]*50)
 
     @property
     def blit_pos(self):
         """ 获得棋子便宜后的实际坐标 """
-        return (self.pos[0]*50 + DETA_X, self.pos[1]*50 + DETA_Y)
+        return (self.pos[1]*50 + DETA_X, self.pos[0]*50 + DETA_Y)
     
     @property
     def value(self):
-        if self.pos in TRAP[not self.team]: #敌方陷阱中的棋子价值为-1
-            return -1
+        if self.pos in TRAP[not self.team]: #敌方陷阱中的棋子价值为0
+            return 0
         else:
             return self._value
 
@@ -59,7 +59,7 @@ class Piece(object):
 
         def get(*pos: tuple):
             # 避开河流和己方棋子
-            if pos not in RIVER and pos not in self.board[self.team].keys():
+            if pos not in RIVER and pos not in self.board[self.team].keys() and 0<=pos[0]<=8 and 0<=pos[1]<=6:
 
                 self._passable_area.append(pos)
 
@@ -69,16 +69,6 @@ class Piece(object):
         get(self._pos[0]-1, self._pos[1])
 
         return self._passable_area
-
-    
-
-    def picked_me(self):
-        self.piece_picked[0] = self
-
-    def not_picked(self):
-        self.piece_picked[0] = 0
-
-
 
     def del_me(self):
         """ 移除棋子的方法 """
@@ -96,15 +86,15 @@ class Piece(object):
         print(self.value)
         print(target_piece.value)
         #该方法默认self为主动的棋子
-        #吃掉陷阱中的棋子
-        if target_piece.value == -1:
+
+        if target_piece.value == 0:        #吃掉陷阱中的棋子
             print("is 1")
             return target_piece
         #老鼠吃大象
-        elif self.value == 0 and target_piece.value == 7:
+        elif self.value == 1 and target_piece.value == 8:
             print("is 2")
             return target_piece
-        elif self.value == 7 and target_piece.value == 0:
+        elif self.value == 8 and target_piece.value == 1:
             print("is 3")
             return self
         #大吃小
@@ -127,6 +117,39 @@ class Piece(object):
         if pos in (HOME[not self.team], 1):
             self.game_over.append(1)
             print("Game Over")
+    
+    @classmethod
+    def get_piece(cls, pos):
+        """ 通过传入坐标返回棋子对象 """
+        if pos in cls.all_pos(1):
+            return cls.board[1][pos]
+        elif pos in cls.all_pos(0):
+            return cls.board[0][pos]
+        else:
+            return None
+
+    @classmethod
+    def get_next_steps(cls,turn) -> List[tuple]:
+        """ 获取可走的下一步棋 """    
+        next_steps = []
+        for piece in cls.all_piece(turn):
+            next_steps += map(lambda pos: (piece.pos,pos),piece.passable_area)
+        return next_steps
+    
+    @classmethod
+    def get_piece_picked(cls) -> 'Piece': 
+        """ 返回被选中的棋子对象 
+            返回0时表示无选中棋子
+            """
+        return cls.piece_picked
+
+    @classmethod
+    def set_piece_picked(cls, piece:'Piece'):
+        cls.piece_picked = piece
+
+    @classmethod
+    def clear_piece_picked(cls):
+        cls.piece_picked = None
 
     @classmethod
     def all_piece(cls,team:int='all') -> List['Piece']:
@@ -144,23 +167,13 @@ class Piece(object):
         else:
             return tuple(cls.board[team].keys())
 
-    @classmethod
-    def piece_picked_1(cls):
-        pass
-
-    @classmethod
-    def get_piece_picked(cls) -> 'Piece': 
-        """ 返回被选中的棋子对象 
-            返回0时表示无选中棋子
-            """
-        return cls.piece_picked[0]
 
     @classmethod
     def reboot(cls):
 
         cls.board = [{},{}]
         cls.turn = False  # 两个队伍的轮换，false为黑队
-        cls.piece_picked = [0]  # 储存被选中的Piece对象
+        cls.piece_picked = 0  # 储存被选中的Piece对象
         cls.game_over = []  # 空列表表示None
 
     @staticmethod
@@ -168,6 +181,23 @@ class Piece(object):
         """ 将窗口坐标转换为棋盘坐标 """
         print(window_pos)
         return window_pos[0]//50, window_pos[1]//50
+
+    @classmethod
+    def get_board_matrix(cls):
+        board_matrix = []
+        for row in range(9):
+            board_matrix.append([])
+            for column in range(7):
+                if (row,column) in cls.all_pos(0):
+                    board_matrix[row].append(cls.board[0][(row,column)]._value)
+                elif (row,column) in cls.all_pos(1):
+                    board_matrix[row].append(cls.board[1][(row,column)]._value*(1*-1))
+                else:
+                    board_matrix[row].append(0)
+        
+        return board_matrix
+
+
 
 
 class Lion_tiger(Piece):
@@ -181,10 +211,10 @@ class Lion_tiger(Piece):
         self._passable_area = []  # 重置target_area
 
         def get(*pos: tuple):
-            if pos not in self.board[self.team].keys():  # 避开己方棋子
+            if pos not in self.board[self.team].keys() and 0<=pos[0]<=8 and 0<=pos[1]<=6:  # 避开己方棋子
                 if pos in RIVER:
                     self._passable_area.append(
-                        (self._pos[0]+(pos[0]-self._pos[0])*3, self._pos[1]+(pos[1]-self._pos[1])*4))
+                        (self._pos[0]+(pos[0]-self._pos[0])*4, self._pos[1]+(pos[1]-self._pos[1])*3))
                 else:
                     self._passable_area.append(pos)
 
@@ -208,7 +238,7 @@ class Mouse(Piece):
 
         def get(*pos: tuple):
             if self._pos not in RIVER:
-                if pos not in self.board[self.team].keys():  # 避开己方棋子
+                if pos not in self.board[self.team].keys() and 0<=pos[0]<=8 and 0<=pos[1]<=6:  # 避开己方棋子
                     self._passable_area.append(pos)
             else:
                 if pos not in self.board[0].keys() and pos not in self.board[1].keys():

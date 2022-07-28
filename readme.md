@@ -17,7 +17,7 @@ screen_setting.py --> function_in_game.py
 piece.json-->function_in_game.py
 piece.py --> function_in_game.py
 function_in_game.py -->main.py
-screen_setting.py--> button.py --> start_menu.py --> main.py
+screen_setting.py --> start_menu.py --> main.py
 
 ```
 
