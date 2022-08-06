@@ -25,6 +25,11 @@ RED_F = 31
 BLUE_F = 34
 BLUE_B = 44
 
+""" Board """
+BOARD_ROW = 9   #lxkr
+BOARD_COLUMN = 7
+
+
 """ window """
 CELL_WIDTH ,CELL_HEIGHT = 50, 50
 DETA_X = 7 #为了棋子居于各自中间的偏差量

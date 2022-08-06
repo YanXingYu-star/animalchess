@@ -75,7 +75,7 @@ def blit_information():
 def blit_game_screen():
     """ 绘制棋子 """
     draw_checkerboard()
-    for a_piece in piece.Piece.all_piece():    #依次绘制各棋子
+    for a_piece in piece.Piece.all_piece()[2]:    #依次绘制各棋子
         board_surface.blit_text(a_piece.name,a_piece.blit_pos,TEAM[a_piece.team])
     draw_choice()
     blit_information()
@@ -99,7 +99,7 @@ def robot_act():
     global actor_team
     #next_step = random.choice(Piece.get_next_steps(actor_team))
     next_step = strategy.choose_next_step(Piece.get_next_steps(actor_team))
-    Piece.board[actor_team][next_step[0]].move(next_step[1])
+    Piece.piece_on(next_step[0]).move(next_step[1])
     actor_team = not actor_team
 
 
@@ -114,13 +114,13 @@ def reponse_click(pos):
 
         pos = tuple(reversed(pos))
         print("点击位置为{}".format(pos))
-        print(Piece.all_pos(actor_team))  
+        print(Piece.all_pos()[actor_team])  
 
         if not Piece.get_piece_picked():
 
-            if pos in Piece.all_pos(actor_team):
-                print(Piece.all_pos(actor_team))    
-                Piece.set_piece_picked(Piece.board[actor_team][pos])
+            if pos in Piece.all_pos()[actor_team]:
+                print(Piece.all_pos()[actor_team])    
+                Piece.set_piece_picked(Piece.piece_on(pos))
                 print("被选中的棋子是"+Piece.get_piece_picked().name)
                 print("它可走的位置是", Piece.get_piece_picked().passable_area)
         else:
@@ -135,8 +135,8 @@ def reponse_click(pos):
             elif pos == Piece.get_piece_picked()._pos:  # 点击正选中的棋子，取消选中
                 Piece.clear_piece_picked()
             
-            elif pos in Piece.all_pos(actor_team):  # 选中己方其他棋子，选中该棋子
-                Piece.set_piece_picked(Piece.board[actor_team][pos])
+            elif pos in Piece.all_pos()[actor_team]:  # 选中己方其他棋子，选中该棋子
+                Piece.set_piece_picked(Piece.piece_on(pos))
 
 
 
