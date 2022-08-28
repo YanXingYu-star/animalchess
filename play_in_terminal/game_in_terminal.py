@@ -7,7 +7,7 @@ import re
 
 
 from piece import Piece, Lion_tiger, Mouse
-from setting import *
+from settings import *
 import play_in_terminal.terminal_print as terminal_print
 
 """ 游戏初始化 """
