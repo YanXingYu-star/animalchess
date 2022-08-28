@@ -16,7 +16,7 @@
 graph TD
     level.py --> main.py
     menu.py --> main.py
-    piece.py & board.py &piece.json -->level.py
+    piece.py & board.py & piece.json -->level.py
 
 
 ```
