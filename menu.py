@@ -1,26 +1,18 @@
-"""该模块用于构建开始菜单 """
-import screen_setting
+import pygame_gui
+import pygame
 
-class Switch(object):
-    def __init__(self):
-        self.take_effect = False
+from settings import *
 
-    def toggle_switch(self):
-        self.take_effect = not self.take_effect
-
-    def reponse_click(self):
-        self.toggle_switch() 
-
-game_start = Switch()
-start_button = screen_setting.Button((400,50),"开始游戏",game_start)
-
-def blit_start_screen():
-    start_button.blit()
-
-@screen_setting.event_check
-def start_check_click(pos):
-        print(start_button.check_click(pos))
-        print("open:{}".format(start_button.open))
-
-game_pause = Switch()
-pause_button = screen_setting.Button((400,150),"暂停游戏",game_pause)
+class Menu(object):
+    def __init__(self,manager):
+        self.manager = manager
+        
+        self.setup()
+    
+    def setup(self):
+        self.back_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((CELL_WIDTH*7+20, 0), (100, 50)),
+                                                        text='退出游戏',
+                                                        manager=self.manager)
+        self.start_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((CELL_WIDTH*7+20, 50), (100, 50)),
+                                                        text='开始游戏',
+                                                        manager=self.manager)   
