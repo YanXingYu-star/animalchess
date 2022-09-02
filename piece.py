@@ -3,30 +3,6 @@ from typing import List, Dict, Tuple
 from settings import *
 import pygame
 
-
-
-class Board(object):
-    def __init__(self,width,height):
-        self.width = width
-        self.height = height
-        self.board = [[None]*width for i in range(height)]
-        self.river = []
-        self.trap = []
-        self.home = []
-    
-    def in_board(self,pos):
-        (x,y) = pos
-        return 0 <= x < self.width and 0 <= y < self.height
-
-    def in_river(self,pos):
-        return pos in self.river
-
-    def in_trap(self,pos,team):
-        return pos in self.trap[team]
-
-    def in_home(self,pos,team):
-        return pos in self.home[team]
-
 class Piece(pygame.sprite.Sprite):
     """ Piece类
         实例具有移动位置，判断吃子等方法.
@@ -35,22 +11,22 @@ class Piece(pygame.sprite.Sprite):
     @classmethod
     def reset(cls):
         """ 初始化类变量 """
-        cls.board = [[None]*BOARD_ROW for i in range(BOARD_COLUMN)]
-        cls.pos_list = [[], []]
+        cls.pos_list = [{}, {}]
         cls.piece_picked = [None]  # 储存被选中的Piece对象
         cls.game_over = [None]
         cls.turn = [0]
         cls.click_pos = [None]
+        cls.reponse_num = 0
 
     def __init__(self,group, name, team: bool, *pos):
+
         super().__init__(group)
+
         self._pos = pos  # pos为行列数,左上角为0,0
         self.team = team  # team传入0或1
         self.name = name
         self._value = animal.index(self.name)+1  # 用ANIMAL列表中的顺序来代表棋子的价值，用来判断吃子
-
-        self.board[self.pos[0]][self.pos[1]] = self
-        self.pos_list[self.team].append(self.pos)
+        self.pos_list[self.team][self.pos] = self
 
         # 图形
         self._image = pygame.Surface((49,49))
@@ -59,66 +35,25 @@ class Piece(pygame.sprite.Sprite):
         
     
     @property
-    def image(self):
-        self._image.fill("white")
-        self._image.blit(self._font_surface,(10,4))
-        if self.piece_picked[0] == self:
-            pygame.draw.rect(self._image,GOLD, (0, 0,50, 50), 2)
-        return self._image
-
-
-    def input(self,pos):
-        """ 棋子响应传入坐标 """
-        if pos:
-            if self.turn[0] == self.team:
-                if self.piece_picked[0] == self:
-                    if pos in self.passable_area:
-                        self.pos = pos
-                        self.piece_picked[0] = None
-                        self.turn[0] = not self.turn[0]
-                        print("move",self.name,self.team,self.pos)
-                    else:
-                        self.piece_picked[0] = None
-                        print("cancel",self.name,self.team)
-                    self.click_pos[0] = None
-                    
-                else:
-                    if pos == self.pos:
-                        self.piece_picked[0] = self
-                        print(self.piece_picked[0],self.name,self.team)
-                        self.click_pos[0] = None
-                        print("choose",self.name,self.team)
-
-    def remove_from_group(self):
-        if self.pos not in self.all_pos()[self.team]:
-            self.kill()
-            print("kill",self.name,self.team)
-              
-    def update(self):
-        self.input(self.click_pos[0])
-        self.remove_from_group()
-    
-    @property
     def pos(self):
         return self._pos
 
     @pos.setter
     def pos(self, pos):
         """ 将self._pos更新至cls.board """
-        self.board[self.pos[0]][self.pos[1]] = None
-        self.pos_list[self.team].remove(self.pos)
+
+        self.pos_list[self.team].pop(self.pos,0) 
         self._pos = pos
-        self.board[self.pos[0]][self.pos[1]] = self
-        self.pos_list[self.team].append(self.pos)
+        self.pos_list[self.team][self.pos] = self
         self.rect = self.image.get_rect(topleft=self.real_pos)
 
-        if self.pos in self.pos_list[not self.team]:
-            self.pos_list[not self.team].remove(self.pos)
-            if not self.pos_list[not self.team]:
-                self.game_over[0] = True
+        self.pos_list[not self.team].pop(self.pos,1)
 
-        if self._pos == HOME[not self.team]:
+        if self.pos == HOME[not self.team]:
             self.game_over[0] = True
+        if not self.all_pos()[not self.team]:
+            self.game_over[0] = True
+
         return self.pos
 
     @property
@@ -139,24 +74,48 @@ class Piece(pygame.sprite.Sprite):
             return self._value
 
     @property
-    def passable_area(self):
-        """ 输出包含可移动的位置的列表"""
-        self._passable_area = []  # 重置target_area
+    def image(self):
+        self._image.fill("white")
+        self._image.blit(self._font_surface,(10,4))
+        if self.piece_picked[0] == self:
+            pygame.draw.rect(self._image,GOLD, (0, 0,50, 50), 2)
+        return self._image
 
-        def get(*pos: tuple):
-            # 避开河流和己方棋子
-            if pos not in RIVER and pos not in self.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8:
-                if not(pos in self.all_pos()[not self.team] and self.compare_value(self.piece_on(pos)) == self):
 
-                    self._passable_area.append(pos)
+    def input(self,pos):
+        """ 棋子响应传入坐标 """
+        if pos:
+            if self.turn[0] == self.team:
+                print("is turn")
+                #被选中
+                if self.piece_picked[0] == self:
+                    if pos in self.passable_area:
+                        self.pos = pos
+                        self.piece_picked[0] = None
+                        self.turn[0] = not self.turn[0]
+                        print("move",self.name,self.team,self.pos)
+                    else:
+                        self.piece_picked[0] = None
+                        print("cancel",self.name,self.team)
+                    self.click_pos[0] = None
+                    
+                else:
+                    print(pos,self.pos)
+                    if pos == self.pos:
+                        self.click_pos[0] = None
+                        self.piece_picked[0] = self
+                        print(self.piece_picked[0],self.name,self.team)
+                        print("choose",self.name,self.team)
 
-        get(self._pos[0], self._pos[1]+1)
-        get(self._pos[0], self._pos[1]-1)
-        get(self._pos[0]+1, self._pos[1])
-        get(self._pos[0]-1, self._pos[1])
-
-        return self._passable_area
-
+    def remove_from_group(self):
+        if self.pos not in self.all_pos()[self.team]:
+            self.kill()
+            print("kill",self.name,self.team)
+              
+    def update(self):
+        self.input(self.click_pos[0])
+        self.remove_from_group()
+    
     def compare_value(self, target_piece: 'Piece'):
         """ 比较两棋子的价值，返回价值较小的棋子 """
 
@@ -179,23 +138,52 @@ class Piece(pygame.sprite.Sprite):
             print("is 5")
             return self
 
+    @property
+    def passable_area(self):
+        """ 输出包含可移动的位置的列表"""
+        self._passable_area = []  # 重置target_area
+
+        def get(*pos: tuple):
+            # 避开河流和己方棋子
+            if pos not in RIVER and pos not in self.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8:
+                if not(pos in self.all_pos()[not self.team] and self.compare_value(self.piece_on(pos)) == self):
+
+                    self._passable_area.append(pos)
+
+        get(self._pos[0], self._pos[1]+1)
+        get(self._pos[0], self._pos[1]-1)
+        get(self._pos[0]+1, self._pos[1])
+        get(self._pos[0]-1, self._pos[1])
+
+        return self._passable_area
+
+
 
     @classmethod
     def all_pos(cls):
         """ 返回指定队伍棋子的坐标 """
-        return cls.pos_list[0], cls.pos_list[1], cls.pos_list[0]+cls.pos_list[1]
-
-    @classmethod
-    def piece_on(cls, pos) -> 'Piece':
-        """ 通过传入坐标返回棋子对象 """
-        return cls.board[pos[0]][pos[1]]
+        team0_pos = list(cls.pos_list[0].keys())
+        team1_pos = list(cls.pos_list[1].keys())
+        return team0_pos, team1_pos, team0_pos+team1_pos
 
     @classmethod
     def all_piece(cls) -> Tuple[List['Piece']]:
         """ 返回包含所有棋子的元组 """
-        piece_team0 = [cls.piece_on(pos) for pos in cls.all_pos()[0]]
-        piece_team1 = [cls.piece_on(pos) for pos in cls.all_pos()[1]]
-        return piece_team0, piece_team1, piece_team0 + piece_team1
+        team0_pieces = list(cls.pos_list[0].values())
+        team1_pieces = list(cls.pos_list[1].values())
+        return team0_pieces, team1_pieces, team0_pieces+team1_pieces
+
+    @classmethod
+    def piece_on(cls, pos) -> 'Piece':
+        """ 通过传入坐标返回棋子对象 """
+        if pos in cls.all_pos()[0]:
+            return cls.pos_list[0][pos]
+        elif pos in cls.all_pos()[1]:
+            return cls.pos_list[1][pos]
+        else:
+            return None
+
+
 
     @classmethod
     def get_next_steps(cls, turn) -> List[tuple]:
@@ -243,10 +231,10 @@ class Piece(pygame.sprite.Sprite):
         return board_matrix
 
 
-class Lion_tiger(Piece):
+class LionTiger(Piece):
 
     def __init__(self, name, team, *pos):
-        super(Lion_tiger, self).__init__(name, team, *pos)
+        super(LionTiger, self).__init__(name, team, *pos)
 
     @property
     def passable_area(self):
@@ -271,6 +259,23 @@ class Lion_tiger(Piece):
 class Mouse(Piece):
     def __init__(self, name, team, *pos):
         super(Mouse, self).__init__(name, team, *pos)
+    
+    @property
+    def back_color(self):
+        if self.pos in RIVER:
+            self._back_color = 'blue'
+        else:
+            self._back_color = 'white'
+        return self._back_color
+
+    @property
+    def image(self):
+        self._image.fill(self.back_color)
+        self._font_surface = font.render(self.name, True, TEAM[self.team],self.back_color)
+        self._image.blit(self._font_surface,(10,4))
+        if self.piece_picked[0] == self:
+            pygame.draw.rect(self._image,GOLD, (0, 0,50, 50), 2)
+        return self._image
 
     @property
     def passable_area(self):

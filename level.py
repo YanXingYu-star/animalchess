@@ -13,6 +13,7 @@ class Level(object):
         self.display_surface = pygame.display.get_surface()
 
         self.all_sprites = pygame.sprite.Group()
+        self.piece_sprites = TestGroup()
 
         self.setup()
 
@@ -27,13 +28,13 @@ class Level(object):
         with open("piece.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         for i in data['piece']:
-            piece.Piece(self.all_sprites,
+            piece.Piece(self.piece_sprites,
                         i["name"], i["team"], *eval(i["pos"]))
         for i in data['lion_tiger']:
-            piece.Lion_tiger(self.all_sprites,
+            piece.LionTiger(self.piece_sprites,
                              i["name"], i["team"], *eval(i["pos"]))
         for i in data['mouse']:
-            piece.Mouse(self.all_sprites,
+            piece.Mouse(self.piece_sprites,
                         i["name"], i["team"], *eval(i["pos"]))
 
     def check_game_over(self):
@@ -52,4 +53,19 @@ class Level(object):
         self.display_surface.fill('white')
         self.all_sprites.draw(self.display_surface)
         self.all_sprites.update()
+        self.piece_sprites.draw(self.display_surface)
+        self.piece_sprites.update()
         self.check_game_over()
+
+
+class TestGroup(pygame.sprite.Group):
+    def __init__(self):
+        super().__init__()
+
+    def update(self, *args, **kwargs):
+        for sprite in self.sprites(): 
+            if sprite != sprite.piece_picked[0]:
+                sprite.update(*args, **kwargs)
+        for sprite in self.sprites():
+            if sprite == sprite.piece_picked[0]:
+                sprite.update(*args, **kwargs)
