@@ -1,4 +1,3 @@
-from turtle import home
 import pygame
 from settings import *
 

@@ -8,7 +8,7 @@
 
 ```python```版本:3.6+
 
-<img src="resource\Demo.gif"/>
+<!-- <img src="resource\Demo.gif"/> -->
 
 ### 框架
 
