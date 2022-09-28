@@ -22,15 +22,15 @@ class Board(pygame.sprite.Sprite):
         #画格子
         for x in range(self.width):
             for y in range(self.height):
-                pygame.draw.rect(self.image,BLACK, (x*50, y*50, 50, 50), 1)
+                pygame.draw.rect(self.image,"black", (x*50, y*50, 50, 50), 1)
 
         #河流
         for pos in RIVER:
-            pygame.draw.rect(self.image,BLUE,(pos[0]*50, pos[1]*50,50,50),0)
+            pygame.draw.rect(self.image,"deepskyblue",(pos[0]*50, pos[1]*50,50,50),0)
         #陷阱
         for t in TRAP:
             for pos in t:       
-                trap_surface=font.render("陷",True,BLUE,WHITE)
+                trap_surface=font.render("陷",True,"blue","white")
                 self.image.blit(trap_surface,(pos[0]*50+DETA_X, pos[1]*50+ DETA_Y))
 
         #兽穴

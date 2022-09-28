@@ -7,7 +7,7 @@ import piece
 import board
 
 
-class Level(object):
+class Level(Controller):
     def __init__(self):
 
         self.display_surface = pygame.display.get_surface()
@@ -17,7 +17,13 @@ class Level(object):
 
         self.setup()
 
-        self.game_over = False
+        self.game_over = True
+
+        """ GUI """
+        self.manager = pygame_gui.UIManager((CELL_WIDTH*7+200, CELL_HEIGHT*9+2),starting_language='zh')
+        self.back_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((CELL_WIDTH*7+20, 0), (100, 50)),
+                                                        text='退出游戏',
+                                                        manager=self.manager)
 
     def setup(self):
         # 创建棋盘
@@ -40,6 +46,7 @@ class Level(object):
     def check_game_over(self):
         if piece.Piece.game_over[0]:
             self.game_over = True
+            self.init()
 
     def blit_game_over(self):
         self.display_surface.fill('white')
@@ -49,13 +56,26 @@ class Level(object):
         time.sleep(1)
             
 
-    def run(self):
+    def run(self,delta_time):
         self.display_surface.fill('white')
         self.all_sprites.draw(self.display_surface)
         self.all_sprites.update()
         self.piece_sprites.draw(self.display_surface)
         self.piece_sprites.update()
         self.check_game_over()
+        
+        self.manager.update(delta_time)
+        self.manager.draw_ui(self.display_surface)
+
+
+    def reponse_click(self,pos):
+        piece.Piece.click_pos[0] = piece.Piece.convert_to_board(pos)
+
+    def reponse_button(self,ui_element):
+        if ui_element == self.back_button:
+            self.game_over = True
+            self.__init__()
+            print("back")
 
 
 class TestGroup(pygame.sprite.Group):
