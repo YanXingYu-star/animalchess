@@ -11,12 +11,9 @@ class Board(object):
         储存棋盘信息
         提供响应鼠标点击、移动棋子、判断胜负等方法"""
 
-    def __init__(self, group, width, height):
-        self.group = group
+    def __init__(self, width, height):
         self.width = width  # 横向的格数
         self.height = height
-        self.sprite = BoardSprite(self.group, self.width, self.height)
-
         self.pos_list = [{}, {}]  # [team1dict{pos:Piece},{}]
         self._piece_picked = None
         self.turn = 0
@@ -92,10 +89,11 @@ class Board(object):
         team1_pos = list(self.pos_list[1].keys())
         return team0_pos, team1_pos, team0_pos + team1_pos
 
-    def all_piece(self) -> Tuple[List[Piece]]:
+    def all_pieces(self) -> Tuple[List[Piece]]:
         """ 返回包含所有棋子的元组 """
         team0_pieces = list(self.pos_list[0].values())
         team1_pieces = list(self.pos_list[1].values())
+        print(team0_pieces + team1_pieces)
         return team0_pieces, team1_pieces, team0_pieces + team1_pieces
 
     def piece_on(self, pos) -> 'Piece':
@@ -110,20 +108,30 @@ class Board(object):
     def get_next_steps(self, turn) -> List[tuple]:  # TODO
         """ 获取可走的下一步棋 """
         next_steps = []
-        for piece in self.all_piece()[turn]:
+        for piece in self.all_pieces()[turn]:
             next_steps += map(lambda pos: (piece.pos, pos),
                               piece.get_passable_area(self))
         return next_steps
 
+    def add_piece(self,piece:Piece):
+        """ 将棋子添加到棋盘 """
+        self.pos_list[piece.team][piece.pos] = piece
+
+    @staticmethod
+    def convert_to_board(window_pos):
+        """ 将窗口坐标转换为棋盘坐标 """
+        # print(window_pos)
+        return window_pos[0]//50, window_pos[1]//50
+
 
 class BoardSprite(pygame.sprite.Sprite):
     """ 渲染棋盘 """
-    def __init__(self, group, width, height):
+    def __init__(self, group,board:Board):
         super().__init__(group)
-        self.width = width  # 横向的格数
-        self.height = height
+        self.width = board.width  # 横向的格数
+        self.height = board.height
 
-        self.image = pygame.Surface((width * 50, height * 50))
+        self.image = pygame.Surface((self.width * 50, self.height * 50))
         self.rect = self.image.get_rect()
         self.draw_board()
 
