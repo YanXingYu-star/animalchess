@@ -3,6 +3,7 @@ import pygame
 
 from settings import *
 class Start_menu(Controller):
+    """ 构建开始菜单 """
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
         self.manager = pygame_gui.UIManager(WINDOW_SIZE,starting_language='zh')

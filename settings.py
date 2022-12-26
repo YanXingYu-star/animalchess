@@ -3,7 +3,7 @@ import pygame_gui
 from abc import ABCMeta, abstractmethod
 
 # 字体
-FONT = 'resource\msyh.ttf'
+FONT = 'resource/msyh.ttf'
 pygame.init()
 font = pygame.font.Font(FONT, 30)
 
@@ -27,6 +27,7 @@ DETA_X = 7 #为了棋子居于各自中间的偏差量
 DETA_Y = 5
 
 class Controller(metaclass = ABCMeta):
+    """ 负责游戏某一进程的控制器 """
     def __init__(self):
         pass
 
@@ -46,3 +47,5 @@ class Controller(metaclass = ABCMeta):
 
 #MOVE_COMMAND = {'up':(-1,0),'down':(1,0),'left':(0,-1),'right':(0,1)}
 
+HUMAN = 0
+COMPUTER = 1
