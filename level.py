@@ -1,6 +1,7 @@
 import pygame
 import json
 import time
+from copy import deepcopy
 
 from settings import *
 import piece
@@ -17,7 +18,7 @@ class Level(Controller):
         self.graph_init()
         self.gui_init()
 
-        self.player = [HUMAN, HUMAN]  # [player1,player2]
+        self.player = [HUMAN, COMPUTER]  # [player1,player2]
         self.game_over = True
 
     @property
@@ -85,9 +86,12 @@ class Level(Controller):
 
         if self.player[self.turn]:  # 如果执棋者是电脑
             print("电脑走棋")  # TODO
-            step = strategy.choose_next_step(
-                self.board.get_next_steps(self.board.turn))
-            piece.Piece.piece_on(step[0]).pos = step[1]
+            step = strategy.move(deepcopy(self.board))
+            print(step)
+            print(self.board.pos_list)
+            self.board.move(self.board.piece_on(step[0]),step[1])
+            print("\n")
+            print(self.board.pos_list)
 
         self.manager.update(delta_time)
         self.manager.draw_ui(self.display_surface)

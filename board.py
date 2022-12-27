@@ -19,6 +19,7 @@ class Board(object):
         self.turn = 0
         self.click_pos = []
         self.winner = []
+        self.move_list = []
 
     @property
     def piece_picked(self):
@@ -47,18 +48,42 @@ class Board(object):
             return "team0"
 
 
-    def move(self, piece:Piece, pos):
-        self.pos_list[piece.team].pop(piece.pos,0) 
-        piece.pos = pos
+
+    def move(self, piece:Piece, target_pos):
+        """ 移动棋子 """
+        from_pos = piece.pos
+        print(self.pos_list[piece.team].pop(piece.pos,0))
+        piece.pos = target_pos
         self.pos_list[piece.team][piece.pos] = piece
 
-        self.pos_list[not piece.team].pop(piece.pos,1)
+        captured_piece = self.pos_list[not piece.team].pop(piece.pos,0)
+        self.capture = captured_piece
+        self.turn = not self.turn
+        
+
+        #if self.check_winner(self.pos_list):
+            #self.winner.append(self.check_winner(self.pos_list))
+
+        self.move_list.append({"from_pos":from_pos,"target_pos":target_pos,"move_piece":piece,"captured_piece":captured_piece})
+        return {"from_pos":from_pos,"target_pos":target_pos,"move_piece":piece,"captured_piece":captured_piece}
+
+    def undo_move(self):
+        """ 撤销移动 """
+        move = self.move_list.pop() #dict
+        from_pos = move["from_pos"]
+        target_pos = move["target_pos"]
+        move_piece = move["move_piece"]
+        captured_piece = move["captured_piece"]
+
+        self.pos_list[move_piece.team].pop(move_piece.pos,0) 
+        self.pos_list[move_piece.team][from_pos] = move_piece
+        move_piece.pos = from_pos
+
+        if captured_piece:
+            self.pos_list[captured_piece.team][target_pos] = captured_piece
+            captured_piece.pos = target_pos
 
         self.turn = not self.turn
-        print(f"turn to {self.turn}")
-
-        if self.check_winner(self.pos_list):
-            self.winner.append(self.check_winner(self.pos_list))
 
     def reponse_click(self):
         if self.click_pos:

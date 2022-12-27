@@ -1,39 +1,71 @@
 import piece
 from settings import *
+import random
+import board
 
-def virtual_pos(me:piece.Piece,target_pos):
-    x = target_pos[0]
-    y = target_pos[1]
-    value = 0
-    for i in (x-1,x,x+1):
-        if 0 <= i < len(piece.Piece.board):
-            for j in (y-1,y,y+1):
-                if 0<= j < len(piece.Piece.board[0]):
-                    if (i,j) != me.pos:
-                        print('aaaaaij'+str((i,j)))
-                        if piece.Piece.piece_on((i,j)) and piece.Piece.piece_on((i,j)).team != me.team:
-                            print('------' + str(piece.Piece.piece_on((i,j))))
-                            if me.compare_value(piece.Piece.piece_on((i,j))) == me:
-                                value -= me.value*0.7 + 2
-                            else:
-                                value += piece.Piece.piece_on((i,j)).value*0.5 + 2
-                        else:
-                            value += 0.01
-    return value
 
-def count_value(step):
-    value = 0
-    piece_pos = step[0]
-    move_pos = step[1]
-    me = piece.Piece.piece_on(piece_pos)
-    targat = piece.Piece.piece_on(move_pos)
-    value += me.value * 0.2
-    value += virtual_pos(me,move_pos)
-    return value
 
-def choose_next_step(steps):
-    valuelist = []
-    for step in steps:
-        valuelist.append(count_value(step))
-    print(max(valuelist),steps[valuelist.index(max(valuelist))])
-    return steps[valuelist.index(max(valuelist))]
+""" -------------------------------------------------------------------------------------------------- """
+
+#TODO
+def minimax(board:board.Board,player,next_player,alpha=-10000,beta=20000,depth = 3):
+
+    if board.check_winner(board.pos_list) == "team1":  # 电脑胜利
+        return +1000
+    elif board.check_winner(board.pos_list) == "team0":     # 人类胜利
+        return -1000
+    if board.capture:
+        if player == COMPUTER:
+            return board.capture.value * -10
+        if player == HUMAN:
+            return board.capture.value * 10
+
+
+    all_move = board.get_next_steps(board.turn)   
+    if depth:
+        for move in all_move:   #move:[from_pos,target_pos]
+            move_piece = board.piece_on(move[0])
+            board.move(move_piece,move[1])
+            val = minimax(board,next_player,player,alpha,beta,depth-1)
+            board.undo_move()
+
+            if player == COMPUTER:
+                if val > alpha:
+                    alpha = val
+                if alpha >= beta:
+                    return beta
+            else:
+                if val < beta:
+                    beta = val
+                if beta <= alpha:
+                    return alpha
+
+    if player == COMPUTER:
+        return alpha
+    else:
+        return beta
+
+def move(board:board.Board):
+    best = -10000
+    my_moves = []
+    all_move = board.get_next_steps(board.turn)   
+    for move in all_move:
+        move_piece = board.piece_on(move[0])
+        board.move(move_piece,move[1])
+        score = minimax(board,HUMAN,COMPUTER)
+        board.undo_move()
+
+        if score > best:
+            best = score
+            my_moves = [move]
+        if score == best:
+            my_moves.append(move)
+
+    move = random.choice(my_moves)
+    print(f"========================mymove is {my_moves} =========================================")
+    print(f"choice is {move}")
+    return move
+
+
+    
+    
