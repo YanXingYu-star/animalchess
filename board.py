@@ -38,21 +38,17 @@ class Board(object):
         return self.piece_picked
 
     def check_winner(self,pos_list):
-        print(111)
         if (3,0) in pos_list[1].keys() or not pos_list[0]:
-            print("team1")
-            return "team1"
+            return TEAM[1]
         if (3,8) in pos_list[0].keys() or (not pos_list[1]):
-            
-            print("team2")
-            return "team0"
+            return TEAM[0]
 
 
 
     def move(self, piece:Piece, target_pos):
         """ 移动棋子 """
         from_pos = piece.pos
-        print(self.pos_list[piece.team].pop(piece.pos,0))
+        self.pos_list[piece.team].pop(piece.pos,0)
         piece.pos = target_pos
         self.pos_list[piece.team][piece.pos] = piece
 
@@ -88,24 +84,17 @@ class Board(object):
     def reponse_click(self):
         if self.click_pos:
             pos = self.click_pos.pop()
-            print(f"{self.turn} 方执棋")
             if not self.piece_picked:
                 if pos in self.all_pos()[self.turn]:
-                    #print(Piece.all_pos(actor_team)) 
                     self.piece_picked = self.piece_on(pos)
-                print(1.1)
             else:
-                print(2)
                 if pos in self.piece_picked.get_passable_area(self):  # 点击坐标在传入棋子的可行动范围内，移动棋子，轮换执棋
                     self.move(self.piece_picked,pos)
                     self.piece_picked = None
-                    print(2.1)
                 elif pos == self.piece_picked.pos:  # 点击正选中的棋子，取消选中
                     self.piece_picked = None
-                    print("2.2")
                 elif pos in self.all_pos()[self.turn]:  # 选中己方其他棋子，选中该棋子
                     self.piece_picked = self.piece_on(pos)
-                    print("2.3")
 
 
     def all_pos(self) -> Tuple[List]:
@@ -118,7 +107,6 @@ class Board(object):
         """ 返回包含所有棋子的元组 """
         team0_pieces = list(self.pos_list[0].values())
         team1_pieces = list(self.pos_list[1].values())
-        print(team0_pieces + team1_pieces)
         return team0_pieces, team1_pieces, team0_pieces + team1_pieces
 
     def piece_on(self, pos) -> 'Piece':
@@ -145,7 +133,6 @@ class Board(object):
     @staticmethod
     def convert_to_board(window_pos):
         """ 将窗口坐标转换为棋盘坐标 """
-        # print(window_pos)
         return window_pos[0]//50, window_pos[1]//50
 
 

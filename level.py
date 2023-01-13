@@ -18,7 +18,7 @@ class Level(Controller):
         self.graph_init()
         self.gui_init()
 
-        self.player = [HUMAN, COMPUTER]  # [player1,player2]
+        self.player = [COMPUTER, HUMAN]  # [player1,player2]
         self.game_over = True
 
     @property
@@ -44,7 +44,6 @@ class Level(Controller):
     def create_piece_sprites(self):
         self.piece_sprites = []
         for p in self.board.all_pieces()[2]:
-            print(p)
             self.piece_sprites.append(piece.PieceSprite(
                 self.all_sprites, p, self.board))
 
@@ -85,13 +84,8 @@ class Level(Controller):
         self.check_game_over()
 
         if self.player[self.turn]:  # 如果执棋者是电脑
-            print("电脑走棋")  # TODO
             step = strategy.move(deepcopy(self.board))
-            print(step)
-            print(self.board.pos_list)
             self.board.move(self.board.piece_on(step[0]),step[1])
-            print("\n")
-            print(self.board.pos_list)
 
         self.manager.update(delta_time)
         self.manager.draw_ui(self.display_surface)
@@ -105,4 +99,4 @@ class Level(Controller):
         if ui_element == self.back_button:
             self.game_over = True
             self.__init__()
-            print("back")
+

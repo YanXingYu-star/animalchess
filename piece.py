@@ -9,12 +9,11 @@ class Piece(object):
         储存单个棋子的位置、队伍、价值等信息，提供计算棋子可走位置的方法"""
 
 
-    def __init__(self, name, team: bool, *pos):
+    def __init__(self, name:str, team: bool, *pos):
         self._pos = pos  # pos为行列数,左上角为0,0
         self.team = team  # team传入0或1
         self.name = name
         self._value = animal.index(self.name)+1  # 用ANIMAL列表中的顺序来代表棋子的价值，用来判断吃子
-        #self.pos_list[self.team][self.pos] = self
         self.choosen = False
 
     @property
@@ -36,24 +35,15 @@ class Piece(object):
 
     def compare_value(self, target_piece: 'Piece'):
         """ 比较两棋子的价值，返回价值较小的棋子 """
-
-        # 陷阱中的棋子被吃
-        if target_piece.value == 0:
-            print("is 1")
-            return target_piece
         # 老鼠吃大象
-        elif self.value == 1 and target_piece.value == 8:
-            print("is 2")
+        if self.value == 1 and target_piece.value == 8:
             return target_piece
         elif self.value == 8 and target_piece.value == 1:
-            print("is 3")
             return self
         # 大吃小
         elif self.value >= target_piece.value:
-            print("is 4")
             return target_piece
         elif self.value < target_piece.value:
-            print("is 5")
             return self
 
     def get_passable_area(self, board) -> list:
@@ -66,7 +56,6 @@ class Piece(object):
                 if not(pos in board.all_pos()[not self.team] and self.compare_value(board.piece_on(pos)) == self):
 
                     self._passable_area.append(pos)
-        print(self._pos)
         get(self._pos[0], self._pos[1]+1)
         get(self._pos[0], self._pos[1]-1)
         get(self._pos[0]+1, self._pos[1])
@@ -186,7 +175,7 @@ class PieceSprite(pygame.sprite.Sprite):
     def remove_from_group(self):
         if self.piece.pos not in self.board.all_pos()[self.piece.team]:
             self.kill()
-            print("kill", self.piece.name, self.piece.team)
+
 
     def update(self):
         self.remove_from_group()
