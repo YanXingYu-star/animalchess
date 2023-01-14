@@ -119,7 +119,9 @@ class Board(object):
             return None
 
     def get_next_steps(self, turn) -> List[tuple]:  # TODO
-        """ 获取可走的下一步棋 """
+        """ 获取可走的下一步棋 
+
+            return list[tuple[piece.pos,target_pos]]"""
         next_steps = []
         for piece in self.all_pieces()[turn]:
             next_steps += map(lambda pos: (piece.pos, pos),
