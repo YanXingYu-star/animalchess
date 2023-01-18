@@ -2,6 +2,7 @@ import pygame_gui
 import pygame
 
 from settings import *
+from controller import Controller
 class Start_menu(Controller):
     """ 构建开始菜单 """
     def __init__(self):

@@ -118,7 +118,7 @@ class Board(object):
         else:
             return None
 
-    def get_next_steps(self, turn) -> List[tuple]:  # TODO
+    def get_next_steps(self, turn) -> List[tuple]:  
         """ 获取可走的下一步棋 
 
             return list[tuple[piece.pos,target_pos]]"""

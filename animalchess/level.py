@@ -4,6 +4,7 @@ import time
 from copy import deepcopy
 
 from settings import *
+from controller import Controller
 import piece
 import board
 import strategy
@@ -27,6 +28,8 @@ class Level(Controller):
         return self.board.turn
 
     def setup(self):
+        """ 创建棋盘和棋子对象 """
+
         # 创建棋盘
         self.board = board.Board(7, 9)
 
@@ -42,15 +45,18 @@ class Level(Controller):
 
     """ 图形界面 """
     def create_piece_sprites(self):
+        """ 添加棋子精灵 """
         self.piece_sprites = []
         for p in self.board.all_pieces()[2]:
             self.piece_sprites.append(piece.PieceSprite(
                 self.all_sprites, p, self.board))
 
     def create_board_sprite(self):
+        """ 添加棋盘精灵 """
         self.board_sprite = board.BoardSprite(self.all_sprites, self.board)
 
     def graph_init(self):
+        """ 图形界面初始化 """
         self.display_surface = pygame.display.get_surface()
         self.all_sprites = pygame.sprite.Group()
 
@@ -58,6 +64,7 @@ class Level(Controller):
         self.create_piece_sprites()
 
     def blit_game_over(self):
+        """ 显示游戏结束 """
         self.display_surface.fill('white')
         game_over_surface = font.render("game over", True, "black", "white")
         self.display_surface.blit(game_over_surface, (0, 0))
@@ -75,6 +82,7 @@ class Level(Controller):
     def check_game_over(self):
         if self.board.check_winner(self.board.pos_list):
             self.game_over = True
+            self.blit_game_over()
             self.__init__()
 
     def run(self, delta_time):
@@ -83,7 +91,7 @@ class Level(Controller):
         self.all_sprites.update()
         self.check_game_over()
 
-        if self.player[self.turn]:  # 如果执棋者是电脑
+        if self.player[self.turn] and (not self.game_over):  # 如果执棋者是电脑
             step = strategy.move(deepcopy(self.board))
             self.board.move(self.board.piece_on(step[0]),step[1])
 

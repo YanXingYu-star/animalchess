@@ -16,8 +16,9 @@ class Game(object):
         self.clock = pygame.time.Clock()
         
         #Controller
-        self.level = Level()
-        self.start_menu_ = Start_menu()
+        self.level = Level()    # 棋局
+        self.start_menu_ = Start_menu() # 菜单
+
         #游戏状态
         self.game_over = True    
 
@@ -46,11 +47,11 @@ class Game(object):
                 self.controller.reponse_button(event.ui_element)  
             self.controller.manager.process_events(event)
         
-
         delta_time = self.clock.tick(20) / 1000
         self.controller.run(delta_time)
 
-        self.game_over = self.controller.game_over
+        self.game_over = self.controller.game_over  
+        
 
         pygame.display.update()
         

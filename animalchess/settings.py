@@ -26,24 +26,7 @@ WINDOW_SIZE = (CELL_WIDTH*7+200, CELL_HEIGHT*9+2)   #窗口大小
 DETA_X = 7 #为了棋子居于各自中间的偏差量
 DETA_Y = 5
 
-class Controller(metaclass = ABCMeta):
-    """ 负责游戏某一进程的控制器 """
-    def __init__(self):
-        pass
 
-    @abstractmethod
-    def reponse_click(self):
-        """ 响应点击 """
-        pass
-
-    @abstractmethod
-    def reponse_button(self):
-        """ 响应按钮 """
-        pass
-
-    @abstractmethod
-    def run(self):
-        pass
 
 #MOVE_COMMAND = {'up':(-1,0),'down':(1,0),'left':(0,-1),'right':(0,1)}
 
