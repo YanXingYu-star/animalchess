@@ -17,11 +17,18 @@ def evaluation(board:Board) -> int:
     for piece in board.all_pieces()[1]:
         value -= CHESS_SCORE[piece.value-1]
         value -= POS_SCORE[piece.value-1][piece.pos[1]][piece.pos[0]]
-    
-    return value
+    if board.check_winner(board.pos_list):
+        if board.check_winner(board.pos_list) == TEAM[0]:
+            value += 100000
+        elif board.check_winner(board.pos_list) == TEAM[1]:
+            value -= 100000
+    if board.turn == 0:
+        return value
+    else:
+        return -value
 
 def negamax(board:Board,depth:int,alpha:int,beta:int,sign:int) -> int:
-    if depth == 0:
+    if depth == 0 or board.check_winner(board.pos_list):
         return evaluation(board)
 
     else:

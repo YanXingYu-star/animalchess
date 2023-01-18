@@ -31,7 +31,7 @@ class Level(Controller):
         self.board = board.Board(7, 9)
 
         # 创建棋子并添加至棋盘
-        with open("piece.json", "r", encoding="utf-8") as f:
+        with open("animalchess/piece.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         for i in data['piece']:
             self.board.add_piece(piece.Piece(i["name"], i["team"], *eval(i["pos"])))
@@ -73,7 +73,7 @@ class Level(Controller):
                                                         manager=self.manager)
     """ 运行 """
     def check_game_over(self):
-        if self.board.winner:
+        if self.board.check_winner(self.board.pos_list):
             self.game_over = True
             self.__init__()
 
@@ -94,6 +94,9 @@ class Level(Controller):
         if not self.player[self.turn]:  # 执棋者是人
             self.board.click_pos.append(self.board.convert_to_board(pos))
             self.board.reponse_click()
+        self.display_surface.fill('white')
+        self.all_sprites.draw(self.display_surface)
+        self.all_sprites.update()
 
     def reponse_button(self, ui_element):
         if ui_element == self.back_button:

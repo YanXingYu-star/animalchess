@@ -3,7 +3,7 @@ import pygame_gui
 from abc import ABCMeta, abstractmethod
 
 # 字体
-FONT = 'resource/msyh.ttf'
+FONT = 'animalchess/resource/msyh.ttf'
 pygame.init()
 font = pygame.font.Font(FONT, 30)
 
@@ -153,5 +153,3 @@ POS_SCORE = [
                 [80, 80, 80, 80, 80, 80, 80]
             ],
         ]
-POS_SCORE.reverse()
-print(POS_SCORE)

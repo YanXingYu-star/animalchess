@@ -52,7 +52,7 @@ class Piece(object):
 
         def get(*pos: tuple):
             # 避开河流和己方棋子
-            if pos not in RIVER and pos not in board.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8 and pos not in HOME[self.team]:
+            if pos not in RIVER and pos not in board.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8 and pos != HOME[self.team]:
                 if not(pos in board.all_pos()[not self.team] and self.compare_value(board.piece_on(pos)) == self):
 
                     self._passable_area.append(pos)
@@ -95,7 +95,7 @@ class LionTiger(Piece):
                        self._pos[1]+(pos[1]-self._pos[1])*4)
                 if not self.river_passable(pos, board):
                     return 0
-            if pos not in board.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8 and pos not in HOME[self.team]:
+            if pos not in board.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8 and pos != HOME[self.team]:
                 if not(pos in board.all_pos()[not self.team] and self.compare_value(board.piece_on(pos)) == self):
                     self._passable_area.append(pos)
 
@@ -119,7 +119,7 @@ class Mouse(Piece):
             if not(pos in board.all_pos()[not self.team] and self.compare_value(board.piece_on(pos)) == self):
                 if self._pos not in RIVER:
                     # 避开己方棋子
-                    if pos not in board.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8 and pos not in HOME[self.team]:
+                    if pos not in board.all_pos()[self.team] and 0 <= pos[0] <= 6 and 0 <= pos[1] <= 8 and pos != HOME[self.team]:
                         self._passable_area.append(pos)
                 else:
                     if pos not in board.all_pos()[self.team] and pos not in board.all_pos()[not self.team]:
